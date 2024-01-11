@@ -29,12 +29,26 @@ export function Post({ author, content, publishedAt }) {
   function handleCreateNewComment() {
     event.preventDefault();
     setComments([...comments, newCommentText]);
-    setNewCommentText('')
+    setNewCommentText("");
   }
 
   function handleNewCommentChange() {
+    event.target.setCustomValidity("");
     setNewCommentText(event.target.value);
   }
+
+  function handleNewCommentInvalid() {
+    event.target.setCustomValidity("");
+  }
+
+  function deleteComment(commentToDelete) {
+    const commentssWithoutDeleteOne = comments.filter(
+      (comment) => comment !== commentToDelete
+    );
+    setComments(commentssWithoutDeleteOne);
+  }
+
+  const isNewCommentEmpty = newCommentText.length === 0;
 
   return (
     <article className={styles.post}>
@@ -62,9 +76,7 @@ export function Post({ author, content, publishedAt }) {
 
           return (
             <p key={`link-${index}`}>
-              <a href="#">
-                {line.content}
-              </a>
+              <a href="#">{line.content}</a>
             </p>
           );
         })}
@@ -78,15 +90,23 @@ export function Post({ author, content, publishedAt }) {
           placeholder="Deixe um comentário"
           onChange={handleNewCommentChange}
           value={newCommentText}
+          onInvalid={handleNewCommentInvalid}
+          required
         />
         <footer>
-          <button type="submit">Publicar</button>
+          <button type="submit" disabled={isNewCommentEmpty}>
+            Publicar
+          </button>
         </footer>
       </form>
 
       <div className={styles.commentList}>
         {comments.map((content, index) => (
-          <Comment key={`comment-${index}`} content={content} />
+          <Comment
+            key={`comment-${index}`}
+            content={content}
+            deleteComment={deleteComment}
+          />
         ))}
       </div>
     </article>
